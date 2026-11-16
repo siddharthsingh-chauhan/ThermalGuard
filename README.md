@@ -12,11 +12,126 @@ every couple of seconds, based on what you are actually doing:
 | **Performance** (orange shield) | heavy all-core load | aggressive turbo |
 
 On top of that it **caps the CPU clock step by step when the CPU gets hot**
-(the tray shield gets a red rim and red thermometer) and releases the cap gradually once it has cooled down.
+and releases the cap gradually once it has cooled down.
 
 It only changes processor settings in its own power plan (a copy of Balanced
 called "ThermalGuard"), so your other plans are never modified. Exiting from
 the tray menu switches back to the plan you had before.
+
+## The tray icon
+
+The shield's colour is the current mode; red on the shield means the CPU
+clock is being capped because the CPU is hot.
+
+| Icon | Meaning |
+|:---:|---|
+| <img src="assets/tray/quiet.png" width="32"> | **Quiet** — light or no work. Turbo off, fans stay low. |
+| <img src="assets/tray/balanced.png" width="32"> | **Balanced** — you're working (sustained load, or one app keeping a core busy). Turbo on. |
+| <img src="assets/tray/performance.png" width="32"> | **Performance** — heavy all-core work (renders, builds, simulations). Aggressive turbo. |
+| <img src="assets/tray/quiet-capped.png" width="32"> <img src="assets/tray/balanced-capped.png" width="32"> <img src="assets/tray/performance-capped.png" width="32"> | **Same modes, capped** — red rim and red thermometer: the CPU passed the "hot" temperature and its maximum clock is limited until it cools down. Normal under long heavy load; if you see it while doing little, check what's running. |
+
+Hover the icon for the details: mode, `(manual)` if you picked a mode
+yourself, the current cap (e.g. `cap 3.8 GHz`), CPU temperature and your load.
+Versions 1.0.0–1.0.1 showed a coloured circle with a letter instead
+(green **Q**, blue **B**, orange **P**, red ring = capped); same meaning.
+
+## How it works
+
+The goal: **full speed when you're working, silence when you're not, and
+never cooking the CPU.** A laptop's own firmware only reacts once it's
+already hot — it slams the clock down at ~100 °C, the fans scream, and
+performance becomes erratic. ThermalGuard decides every 2 seconds from what
+is actually happening, and stays ahead of that point.
+
+```mermaid
+flowchart LR
+    A[Measure every 2 s<br>your CPU load · busiest app<br>temperature · AC/battery] --> B[Pick a mode<br>from load]
+    B --> C[Apply limits<br>app rules · battery · no thermometer · manual]
+    C --> D[Thermal cap<br>step down when hot<br>step up when cool]
+    D --> E[Write to the ThermalGuard power plan<br>turbo · EPP · cooling · max clock]
+```
+
+### 1. Measuring — what counts as "your work"
+
+- **Your load** = total CPU use **minus background services** (Windows
+  Search, Defender, updates, OneDrive, vendor agents… see `background_apps`).
+  Those still run, just without earning turbo — that's what used to make an
+  idle laptop's fans spin up.
+- **Busiest app** in cores (1.0 = one core fully busy). Single-threaded work
+  like CAD or a compiler step is only ~8 % of total CPU on a 12-thread chip,
+  but it still deserves turbo — so this is tracked separately.
+- **Temperature** from LibreHardwareMonitor or HWiNFO, **power source**, and
+  Windows' own throttling counters.
+
+Load is smoothed with **medians over 15 s and 60 s**, so opening an app or a
+two-second spike doesn't count as work — load has to last for about half the
+window.
+
+### 2. Choosing the mode — with hysteresis
+
+| Switch | When |
+|---|---|
+| → **Performance** | your load ≥ 60 % (15 s median) |
+| Performance → Balanced | load < 40 % on *both* the 15 s and 60 s medians, after ≥ 20 s in Performance |
+| → **Balanced** | load ≥ 25 %, **or** the busiest app uses ≥ 0.8 cores |
+| Balanced → Quiet | load < 18 % and busiest app < 0.6 cores on both medians, after ≥ 20 s in Balanced |
+
+The "up" thresholds are higher than the "down" ones, and a mode is only left
+downwards after at least 20 s, so it doesn't flap between modes on a
+borderline load. Going up is quick (about 8 s of sustained load); coming down
+waits until the work has clearly ended.
+
+Then a few limits are applied, in this order:
+
+1. **App rules** (`app_min_modes`) can raise the floor, e.g. keep Balanced
+   while a CAD program is open.
+2. **On battery** it never goes above `battery_max_mode` (Balanced), and
+   leans further towards efficiency.
+3. **No temperature reading?** It stays at Balanced at most — without a
+   thermometer it can't catch overheating early, so it doesn't risk
+   aggressive turbo.
+4. A mode you pick in the tray menu overrides everything.
+
+### 3. What each mode changes
+
+| | Quiet | Balanced | Performance |
+|---|---|---|---|
+| Turbo boost | off | on | aggressive |
+| Energy preference (0 = speed, 100 = efficiency) | 70 | 40 | 15 |
+| Cooling policy | passive (slow the CPU before spinning fans) | active (fans first) | active |
+
+On battery the energy preference gets +20. All of this is in
+[config.py](config.py) and can be changed in `config.json`.
+
+### 4. The thermal cap — staying just below "too hot"
+
+Instead of letting the CPU hit its limit and crash its clock, ThermalGuard
+lowers the **maximum clock in steps** — 4.2 → 3.8 → 3.4 → 3.0 → 2.6 GHz —
+and finds the highest speed the cooler can sustain:
+
+- **≥ 90 °C** (`hot_c`): one step down, at most every 10 s, while it stays hot.
+- **≥ 97 °C** (`critical_c`): straight to the lowest step.
+- **78–90 °C**: hold the current step — this is the sweet spot.
+- **≤ 78 °C** (`cool_c`) for 30 s: one step back up, then the next after
+  another 30 s cool.
+- While capped, the cooling policy is forced to *active*, so fans help.
+
+The gap between 78 and 90 °C keeps it from oscillating, and the
+one-step-at-a-time release means it settles at the fastest clock your
+laptop can hold rather than bouncing between flat out and throttled.
+
+**Without a temperature source** it uses indirect signals instead: Windows'
+throttling counters (3 readings in a row under real load) and *heat soak* —
+5 minutes of ≥ 70 % load triggers a pre-emptive step. These signals can be
+wrong, so in this mode it caps at most two steps (3.8 GHz).
+
+### 5. Applying it
+
+The result is written to ThermalGuard's own power plan (turbo mode, energy
+preference, cooling policy, maximum frequency) only when something changed,
+and the plan is re-activated if something else switched plans. Everything it
+decides is in the log (tray → **Open log**), each change with its reason, e.g.
+`-> balanced, capped at 3800 MHz (active work (41%, busiest app 1.2 cores))`.
 
 ### Why not just use the Windows power slider?
 
