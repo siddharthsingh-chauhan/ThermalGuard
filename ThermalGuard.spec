@@ -32,6 +32,7 @@ version_info = VSVersionInfo(
 
 a = Analysis(
     ["app.py"],
+    datas=[(str(ROOT / "assets" / "tray" / "*.png"), "assets/tray")],
     hiddenimports=["pystray._win32"],
     excludes=["tkinter"],
 )

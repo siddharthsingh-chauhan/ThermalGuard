@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Tray icon template: tools/make_icon.py fills in {top}/{bottom} (mode
+       colour); when the CPU clock is capped the shield rim and the mercury
+       turn red ({rim}, {mercury}, {bulb_ring}).
+       Bold white glyph only: the tray shows this at 16-24 px. -->
+  <defs>
+    <linearGradient id="shield" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="{top}"/>
+      <stop offset="1" stop-color="{bottom}"/>
+    </linearGradient>
+  </defs>
+  <path d="M128 10 L226 45 V118 C226 181 185 226 128 246 C71 226 30 181 30 118 V45 Z"
+        fill="url(#shield)" stroke="{rim}" stroke-width="22" stroke-linejoin="round"/>
+  <path d="M108 136 V70 A20 20 0 0 1 148 70 V136 A40 40 0 1 1 108 136 Z"
+        fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linejoin="round"/>
+  <line x1="128" y1="104" x2="128" y2="168" stroke="{mercury}" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="128" cy="170.6" r="27" fill="{mercury}" stroke="#FFFFFF" stroke-width="{bulb_ring}"/>
+</svg>

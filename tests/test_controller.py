@@ -256,6 +256,18 @@ class PreviousPlan(unittest.TestCase):
         self.assertIsNone(read_saved_plan(None))
 
 
+class TrayIcons(unittest.TestCase):
+    def test_every_mode_and_cap_state_has_a_rendered_icon(self):
+        from app import TRAY_DIR, make_icon
+        from controller import MODES
+
+        for mode in MODES:
+            for capped in (False, True):
+                name = f"{mode}{'-capped' if capped else ''}.png"
+                self.assertTrue((TRAY_DIR / name).exists(), name)
+                self.assertEqual(make_icon(mode, capped).size, (64, 64))
+
+
 class NoTemperature(unittest.TestCase):
     def test_no_aggressive_turbo_without_a_thermometer(self):
         d = Sim().run(30, 95, temp_c=None)

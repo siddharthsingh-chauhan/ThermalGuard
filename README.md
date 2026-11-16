@@ -7,12 +7,12 @@ every couple of seconds, based on what you are actually doing:
 
 | Mode | When | What it does |
 |---|---|---|
-| **Quiet** (green Q) | browsing, documents, idle | turbo off, efficiency-biased, slows the CPU before spinning fans up |
-| **Balanced** (blue B) | sustained work, or one busy app (single-threaded CAD, compiles) | turbo on |
-| **Performance** (orange P) | heavy all-core load | aggressive turbo |
+| **Quiet** (green shield) | browsing, documents, idle | turbo off, efficiency-biased, slows the CPU before spinning fans up |
+| **Balanced** (blue shield) | sustained work, or one busy app (single-threaded CAD, compiles) | turbo on |
+| **Performance** (orange shield) | heavy all-core load | aggressive turbo |
 
 On top of that it **caps the CPU clock step by step when the CPU gets hot**
-(red ring on the icon) and releases the cap gradually once it has cooled down.
+(the tray shield gets a red rim and red thermometer) and releases the cap gradually once it has cooled down.
 
 It only changes processor settings in its own power plan (a copy of Balanced
 called "ThermalGuard"), so your other plans are never modified. Exiting from

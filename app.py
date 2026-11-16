@@ -7,6 +7,7 @@ import threading
 import time
 from ctypes import wintypes
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 import psutil
 
@@ -162,11 +163,17 @@ class Engine:
 
 
 COLORS = {"quiet": (46, 125, 50), "balanced": (21, 101, 192), "performance": (239, 108, 0)}
+# Rendered from assets/tray.svg by tools/make_icon.py; bundled by ThermalGuard.spec
+TRAY_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)) / "assets" / "tray"
 
 
 def make_icon(mode, capped):
     from PIL import Image, ImageDraw, ImageFont
 
+    try:
+        return Image.open(TRAY_DIR / f"{mode}{'-capped' if capped else ''}.png").convert("RGBA")
+    except OSError:
+        pass  # fall back to a drawn circle with the mode's letter
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     draw.ellipse((2, 2, 62, 62), fill=COLORS[mode] + (255,))
