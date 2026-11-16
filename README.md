@@ -162,6 +162,20 @@ elevated without a UAC prompt each time).
 Requirements: Windows 10 or 11, 64-bit. Built and tested on an Intel laptop;
 AMD should work since it only uses standard Windows power settings.
 
+### Verify your download
+
+Every installer is built by GitHub Actions from the code in this repository
+(see [the workflow](.github/workflows/release.yml)), and each
+[release](https://github.com/siddharthsingh-chauhan/ThermalGuard/releases)
+lists its SHA-256 checksum and a VirusTotal scan link. To check the file you
+downloaded:
+
+```powershell
+Get-FileHash .\ThermalGuard-Setup-1.0.3.exe
+```
+
+The hash must match the one in the release notes.
+
 **Uninstall:** Settings → Apps → ThermalGuard. This removes the logon task and
 the ThermalGuard power plan and switches back to the plan you used before
 ThermalGuard (Balanced if that plan no longer exists). Your settings and logs in
@@ -260,7 +274,27 @@ installs that folder directly. Run unpackaged with
 Releases: bump `version.py`, then push a tag `v<version>` — GitHub Actions
 builds the installer and attaches it to a release.
 
+## Privacy
+
+This program will not transfer any information to other networked systems
+unless specifically requested by the user or the person installing or
+operating it. ThermalGuard only reads sensor data from LibreHardwareMonitor on
+the same PC (`http://127.0.0.1:8085`). The optional LibreHardwareMonitor setup
+downloads that program with `winget` when you tick it in the installer.
+
+## Code signing policy
+
+Releases are currently **not code-signed** (hence the SmartScreen warning).
+ThermalGuard is applying for free code signing from
+[SignPath.io](https://about.signpath.io) with a certificate by
+[SignPath Foundation](https://signpath.org). Once that is in place, only
+installers built by GitHub Actions from this repository will be signed, each
+after manual approval by the approver below.
+
+- Committers and reviewers: [siddharthsingh-chauhan](https://github.com/siddharthsingh-chauhan)
+- Approvers: [siddharthsingh-chauhan](https://github.com/siddharthsingh-chauhan)
+
 ## License
 
 MIT — see [LICENSE](LICENSE). No warranty: ThermalGuard changes Windows power
-settings; uninstalling restores Balanced.
+settings; uninstalling switches back to the power plan you used before.

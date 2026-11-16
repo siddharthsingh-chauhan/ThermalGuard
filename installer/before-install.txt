@@ -1,0 +1,32 @@
+What ThermalGuard changes on this PC
+====================================
+
+ThermalGuard switches your CPU between quiet, balanced and performance modes
+depending on what you are doing, and limits the CPU clock when it gets hot.
+To do that, Setup and the app make these changes:
+
+  * A power plan named "ThermalGuard" (a copy of Windows' Balanced plan) is
+    created and made active while ThermalGuard runs. Only its processor
+    settings are changed. Your other power plans are not modified, and the plan
+    you used before is switched back on when you exit or uninstall.
+
+  * A Task Scheduler task named "ThermalGuard" starts the app at every logon
+    for your account, with administrator rights and without a UAC prompt
+    (changing power settings needs them).
+
+  * Settings and logs are kept in %LOCALAPPDATA%\ThermalGuard.
+
+Optional, only if you tick them on the next pages:
+
+  * Install LibreHardwareMonitor (downloaded with winget) and start it at
+    logon, so ThermalGuard can read the CPU temperature.
+
+  * Set closing the lid on battery, and pressing the power button, to
+    Hibernate in all power plans.
+
+ThermalGuard does not send any data anywhere. It only talks to
+LibreHardwareMonitor on this PC (http://127.0.0.1:8085).
+
+Uninstall from Settings > Apps > ThermalGuard: this removes the task and the
+ThermalGuard power plan and switches your previous plan back on. Lid and
+power button settings and LibreHardwareMonitor are left as they are.

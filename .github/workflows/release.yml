@@ -14,6 +14,8 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      HAS_VT_KEY: ${{ secrets.VT_API_KEY != '' }}  # only a yes/no, never the key itself
     steps:
       - uses: actions/checkout@v7
 
@@ -51,9 +53,42 @@ jobs:
           name: ThermalGuard-Setup
           path: dist/ThermalGuard-Setup-*.exe
 
+      # Optional: add a repository secret VT_API_KEY (free VirusTotal account →
+      # API key) and every release is uploaded for a malware scan.
+      - name: Scan with VirusTotal
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_VT_KEY == 'true'
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        shell: pwsh
+        run: |
+          $setup = (Get-Item dist/ThermalGuard-Setup-*.exe).FullName
+          curl.exe --fail --silent --show-error -X POST "https://www.virustotal.com/api/v3/files" `
+            -H "x-apikey: $env:VT_API_KEY" -F "file=@$setup" | Out-Null
+          if ($LASTEXITCODE -ne 0) { Write-Warning "VirusTotal upload failed; the release goes out without it" }
+
+      - name: Release notes with checksum
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $setup = Get-Item dist/ThermalGuard-Setup-*.exe
+          $sha = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLower()
+          @"
+          ### Download
+
+          **$($setup.Name)** — run it and follow the steps. It isn't code-signed yet, so Windows SmartScreen may say "Windows protected your PC": click **More info → Run anyway**.
+
+          ### Verify
+
+          - SHA-256: ``$sha``
+            (PowerShell: ``Get-FileHash .\$($setup.Name)``)
+          - [VirusTotal scan](https://www.virustotal.com/gui/file/$sha)
+
+          "@ | Set-Content release-notes.md -Encoding utf8
+
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v3
         with:
           files: dist/ThermalGuard-Setup-*.exe
+          body_path: release-notes.md
           generate_release_notes: true

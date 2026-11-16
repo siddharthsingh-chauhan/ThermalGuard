@@ -29,6 +29,11 @@ SetupIconFile=..\assets\ThermalGuard.ico
 UninstallDisplayIcon={app}\ThermalGuard.exe
 UninstallDisplayName=ThermalGuard
 LicenseFile=..\LICENSE
+InfoBeforeFile=before-install.txt
+VersionInfoProductName=ThermalGuard
+VersionInfoDescription=ThermalGuard Setup
+VersionInfoVersion={#AppVersion}
+VersionInfoProductVersion={#AppVersion}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -85,7 +90,8 @@ begin
   begin
     if not Exec(ExpandConstant('{app}\ThermalGuard.exe'), '--register-task', ExpandConstant('{app}'),
                 SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then
-      MsgBox('ThermalGuard was installed, but the task that starts it at logon could not be created.' + #13#10 +
-             'Details are in %LOCALAPPDATA%\ThermalGuard\thermalguard.log.', mbError, MB_OK);
+      // Suppressible: silent installs (winget uses /SUPPRESSMSGBOXES) must never wait for a click
+      SuppressibleMsgBox('ThermalGuard was installed, but the task that starts it at logon could not be created.' + #13#10 +
+             'Details are in %LOCALAPPDATA%\ThermalGuard\thermalguard.log.', mbError, MB_OK, IDOK);
   end;
 end;
