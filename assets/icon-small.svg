@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Simplified icon.svg for 16-24 px: same shield and thermometer, bolder
+       strokes, no fine lines (they blur into noise at that size). -->
+  <defs>
+    <linearGradient id="shield" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#3B8BF5"/>
+      <stop offset="1" stop-color="#173FA8"/>
+    </linearGradient>
+    <linearGradient id="heat" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#FF5A3C"/>
+      <stop offset="1" stop-color="#FFB13D"/>
+    </linearGradient>
+  </defs>
+  <path d="M128 8 L228 44 V118 C228 182 186 228 128 248 C70 228 28 182 28 118 V44 Z" fill="url(#shield)"/>
+  <path d="M108 136 V68 A20 20 0 0 1 148 68 V136 A40 40 0 1 1 108 136 Z"
+        fill="#FFFFFF" fill-opacity="0.18" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round"/>
+  <line x1="128" y1="100" x2="128" y2="168" stroke="url(#heat)" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="128" cy="170.6" r="25" fill="url(#heat)"/>
+</svg>

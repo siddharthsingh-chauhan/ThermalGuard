@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- ThermalGuard: a shield guarding a thermometer, with cooling airflow lines.
+       Source for assets/ThermalGuard.ico; regenerate with: python tools/make_icon.py -->
+  <defs>
+    <linearGradient id="shield" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#3B8BF5"/>
+      <stop offset="1" stop-color="#173FA8"/>
+    </linearGradient>
+    <linearGradient id="heat" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#FF5A3C"/>
+      <stop offset="1" stop-color="#FFB13D"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- shield -->
+  <path d="M128 14 L222 48 V118 C222 178 182 222 128 242 C74 222 34 178 34 118 V48 Z"
+        fill="url(#shield)"/>
+  <!-- soft top highlight -->
+  <path d="M128 14 L222 48 V118 C222 124 221.7 130 221 136 C190 120 150 112 128 112 C106 112 66 120 35 136 C34.3 130 34 124 34 118 V48 Z"
+        fill="url(#gloss)"/>
+  <!-- inner rim line -->
+  <path d="M128 32 L206 60 V118 C206 168 173 205 128 223 C83 205 50 168 50 118 V60 Z"
+        fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3"/>
+
+  <!-- airflow lines, left -->
+  <g fill="none" stroke="#BFE3FF" stroke-width="7" stroke-linecap="round">
+    <path d="M66 98 C78 90 88 106 100 98"/>
+    <path d="M62 126 C74 118 84 134 96 126"/>
+    <path d="M66 154 C78 146 88 162 100 154"/>
+  </g>
+
+  <!-- thermometer glass -->
+  <path d="M112 140 V76 A16 16 0 0 1 144 76 V140 A32 32 0 1 1 112 140 Z"
+        fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="round"/>
+  <!-- mercury -->
+  <line x1="128" y1="100" x2="128" y2="164" stroke="url(#heat)" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="128" cy="167.7" r="19" fill="url(#heat)"/>
+
+  <!-- scale ticks, right -->
+  <g stroke="#FFFFFF" stroke-width="6" stroke-linecap="round">
+    <line x1="156" y1="88" x2="176" y2="88"/>
+    <line x1="156" y1="108" x2="170" y2="108"/>
+    <line x1="156" y1="128" x2="176" y2="128"/>
+  </g>
+</svg>
