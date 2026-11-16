@@ -285,11 +285,13 @@ downloads that program with `winget` when you tick it in the installer.
 ## Code signing policy
 
 Releases are currently **not code-signed** (hence the SmartScreen warning).
-ThermalGuard is applying for free code signing from
-[SignPath.io](https://about.signpath.io) with a certificate by
-[SignPath Foundation](https://signpath.org). Once that is in place, only
-installers built by GitHub Actions from this repository will be signed, each
-after manual approval by the approver below.
+The plan is free code signing from [SignPath.io](https://about.signpath.io)
+with a certificate by [SignPath Foundation](https://signpath.org), which is
+available to open-source projects once they have a wider user base. Until
+then, verify downloads with the checksum in the release notes, or install
+with winget. When signing is in place, only installers built by GitHub
+Actions from this repository will be signed, each after manual approval by
+the approver below.
 
 - Committers and reviewers: [siddharthsingh-chauhan](https://github.com/siddharthsingh-chauhan)
 - Approvers: [siddharthsingh-chauhan](https://github.com/siddharthsingh-chauhan)
