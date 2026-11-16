@@ -48,7 +48,8 @@ Requirements: Windows 10 or 11, 64-bit. Built and tested on an Intel laptop;
 AMD should work since it only uses standard Windows power settings.
 
 **Uninstall:** Settings → Apps → ThermalGuard. This removes the logon task and
-the ThermalGuard power plan and switches to Balanced. Your settings and logs in
+the ThermalGuard power plan and switches back to the plan you used before
+ThermalGuard (Balanced if that plan no longer exists). Your settings and logs in
 `%LOCALAPPDATA%\ThermalGuard` are kept; LibreHardwareMonitor and lid/power
 button settings are left as they are.
 

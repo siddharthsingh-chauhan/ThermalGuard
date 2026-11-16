@@ -19,6 +19,7 @@ from version import __version__
 
 log = logging.getLogger("thermalguard")
 STATUS_EVERY_S = 30
+PLAN_STATE_PATH = APP_DIR / "previous_plan.txt"  # survives a forced stop (upgrade, crash)
 _mutex = None
 
 
@@ -246,7 +247,7 @@ def main(argv=None):
     if args.register_task:
         return autostart.register(log)
     if args.unregister:
-        return autostart.unregister(log)
+        return autostart.unregister(log, PLAN_STATE_PATH)
     if not acquire_single_instance():
         log.info("ThermalGuard is already running")
         return 0
@@ -257,7 +258,7 @@ def main(argv=None):
         log.error("config.json is invalid (%s); using built-in defaults", exc)
         cfg = DEFAULTS
 
-    power = PowerManager(dry_run=args.dry_run)
+    power = PowerManager(dry_run=args.dry_run, state_path=PLAN_STATE_PATH)
     try:
         power.setup()
     except PowerError as exc:

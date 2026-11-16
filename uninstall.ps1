@@ -10,4 +10,4 @@ if (Test-Path $exe) {
     Start-Process $exe -ArgumentList "--unregister" -Wait
 }
 Remove-Item $installDir -Recurse -Force -ErrorAction SilentlyContinue
-Write-Host "ThermalGuard removed; Balanced power plan is active." -ForegroundColor Green
+Write-Host "ThermalGuard removed; your previous power plan is active again." -ForegroundColor Green

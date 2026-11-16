@@ -1,5 +1,6 @@
 import struct
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -8,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from autostart import task_xml  # noqa: E402
 from config import DEFAULTS, merge  # noqa: E402
 from controller import Controller, Sample  # noqa: E402
+from power import BALANCED, SCHEME, choose_original, read_saved_plan, save_plan  # noqa: E402
 from sensors import HEADER, READING, parse_hwinfo, parse_lhm, summarize  # noqa: E402
 
 TICK = 2
@@ -225,6 +227,33 @@ class Autostart(unittest.TestCase):
         self.assertIn(r"<Command>C:\Program Files\Thermal &amp; Co\ThermalGuard.exe</Command>", xml)
         self.assertIn(r"<WorkingDirectory>C:\Program Files\Thermal &amp; Co</WorkingDirectory>", xml)
         self.assertEqual(xml.count(r"<UserId>CORP\anne</UserId>"), 2)
+
+
+class PreviousPlan(unittest.TestCase):
+    DELL = "49ef8fc0-bb7f-488e-b6a0-f1fc77ec649b"
+    PLANS = f"{BALANCED} (balanced)\n{DELL} (dell)\n{SCHEME} (thermalguard) *"
+
+    def test_remembers_the_plan_that_was_active(self):
+        self.assertEqual(choose_original(self.DELL, None, self.PLANS), self.DELL)
+
+    def test_after_a_forced_stop_uses_the_saved_plan_not_balanced(self):
+        # Upgrades kill ThermalGuard, so its own plan is still active on the next start
+        self.assertEqual(choose_original(SCHEME, self.DELL, self.PLANS), self.DELL)
+
+    def test_falls_back_to_balanced_if_saved_plan_is_gone_or_missing(self):
+        self.assertEqual(choose_original(SCHEME, self.DELL, f"{BALANCED}\n{SCHEME}"), BALANCED)
+        self.assertEqual(choose_original(SCHEME, None, self.PLANS), BALANCED)
+        self.assertEqual(choose_original(SCHEME, SCHEME, self.PLANS), BALANCED)
+
+    def test_saved_plan_round_trip_and_bad_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "sub" / "previous_plan.txt"
+            self.assertIsNone(read_saved_plan(path))
+            save_plan(path, self.DELL)
+            self.assertEqual(read_saved_plan(path), self.DELL)
+            path.write_text("not a guid")
+            self.assertIsNone(read_saved_plan(path))
+        self.assertIsNone(read_saved_plan(None))
 
 
 class NoTemperature(unittest.TestCase):

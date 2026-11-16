@@ -115,18 +115,19 @@ def stop_other_instances():
     psutil.wait_procs(procs, timeout=10)
 
 
-def unregister(log):
-    from power import BALANCED, SCHEME, PowerError, _powercfg, active_scheme
+def unregister(log, state_path=None):
+    from power import SCHEME, PowerError, _powercfg, active_scheme, choose_original, read_saved_plan
 
     stop_other_instances()
     _schtasks("/Delete", "/TN", TASK_NAME, "/F")
     try:
-        if active_scheme() == SCHEME:
-            _powercfg("/setactive", BALANCED)
-        if SCHEME in _powercfg("/list").lower():
+        plans = _powercfg("/list").lower()
+        target = choose_original(active_scheme(), read_saved_plan(state_path), plans)
+        _powercfg("/setactive", target)
+        if SCHEME in plans:
             _powercfg("/delete", SCHEME)
     except PowerError as exc:
         log.error("Could not remove the ThermalGuard power plan: %s", exc)
         return 1
-    log.info("Logon task and ThermalGuard power plan removed; Balanced is active")
+    log.info("Logon task and ThermalGuard power plan removed; power plan %s is active", target)
     return 0

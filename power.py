@@ -75,19 +75,56 @@ def _powercfg(*args):
     return result.stdout
 
 
+def choose_original(current, saved, plans):
+    """The plan to give back on exit.
+
+    If ThermalGuard's own plan is already active (it was killed, e.g. by an
+    upgrade, before it could restore), fall back to the plan saved on an
+    earlier start rather than to Balanced, as long as that plan still exists.
+    """
+    if current != SCHEME:
+        return current
+    if saved and saved != SCHEME and saved in plans:
+        return saved
+    return BALANCED
+
+
+def read_saved_plan(path):
+    try:
+        text = path.read_text(encoding="utf-8").strip().lower()
+        return str(uuid.UUID(text))
+    except (AttributeError, OSError, ValueError):
+        return None
+
+
+def save_plan(path, scheme):
+    if path is None:
+        return
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(scheme + "\n", encoding="utf-8")
+    except OSError as exc:
+        log.warning("Could not remember the previous power plan: %s", exc)
+
+
 class PowerManager:
-    def __init__(self, dry_run=False):
+    def __init__(self, dry_run=False, state_path=None):
         self.dry_run = dry_run
+        self.state_path = state_path
         self.original = None
         self._applied = {}
         self._last_reassert_log = float("-inf")
 
     def setup(self):
         current = active_scheme()
-        self.original = BALANCED if current == SCHEME else current
+        plans = _powercfg("/list").lower()
+        saved = read_saved_plan(self.state_path)
+        self.original = choose_original(current, saved, plans)
         if self.dry_run:
             return
-        if SCHEME not in _powercfg("/list").lower():
+        if self.original != saved:
+            save_plan(self.state_path, self.original)
+        if SCHEME not in plans:
             _powercfg("/duplicatescheme", BALANCED, SCHEME)
             _powercfg("/changename", SCHEME, "ThermalGuard", "Switched automatically by ThermalGuard")
 

@@ -1,0 +1,57 @@
+name: Bug report
+description: Something doesn't work, or the laptop still runs hot or loud
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did ThermalGuard do instead?
+    validations:
+      required: true
+  - type: input
+    id: laptop
+    attributes:
+      label: Laptop model and CPU
+      placeholder: e.g. Dell Precision 7550, Intel Core i7-10850H
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: Run `winver`
+      placeholder: e.g. Windows 11 24H2 (build 26100)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: ThermalGuard version
+      description: First line of the log after a start, e.g. "ThermalGuard 1.0.1 started"
+    validations:
+      required: true
+  - type: dropdown
+    id: temps
+    attributes:
+      label: Temperature source
+      options:
+        - LibreHardwareMonitor
+        - HWiNFO
+        - None / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: |
+        Tray icon → Open log, copy the last ~50 lines around the problem.
+        (%LOCALAPPDATA%\ThermalGuard\thermalguard.log)
+      render: text
+  - type: textarea
+    id: config
+    attributes:
+      label: Changed settings
+      description: Your config.json, if you changed anything (tray → Edit settings)
+      render: json
