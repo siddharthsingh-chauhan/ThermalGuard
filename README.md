@@ -274,6 +274,23 @@ installs that folder directly. Run unpackaged with
 Releases: bump `version.py`, then push a tag `v<version>` — GitHub Actions
 builds the installer and attaches it to a release.
 
+### Benchmark: with vs without ThermalGuard
+
+Runs the same workload (idle, one busy core, all cores busy, cooldown; about
+17 min) and records CPU temperature, package power, core clock and work done
+from LibreHardwareMonitor every 2 s, then plots both runs side by side:
+
+```powershell
+.\.venv\Scripts\pip install -r requirements-bench.txt
+.\.venv\Scripts\python tools\benchmark.py --label with      # ThermalGuard on Automatic
+# tray icon > Exit, let the fans settle, then:
+.\.venv\Scripts\python tools\benchmark.py --label without
+.\.venv\Scripts\python tools\plot_benchmark.py             # -> benchmark\benchmark.png
+```
+
+For a fair comparison: plugged in, same surface, same apps open (close heavy
+ones), and nothing else running. Each run waits for the CPU to cool first.
+
 ## Privacy
 
 This program will not transfer any information to other networked systems
