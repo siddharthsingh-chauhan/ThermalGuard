@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.28.0.schema.json
 
 PackageIdentifier: siddharthsingh-chauhan.ThermalGuard
 PackageVersion: 1.0.3
@@ -33,4 +33,4 @@ Tags:
 ReleaseNotesUrl: https://github.com/siddharthsingh-chauhan/ThermalGuard/releases/tag/v1.0.3
 InstallationNotes: ThermalGuard starts at every logon through a Task Scheduler task. For CPU temperature readings, install LibreHardwareMonitor (winget install LibreHardwareMonitor.LibreHardwareMonitor) and turn on its web server, or tick that option in the interactive installer.
 ManifestType: defaultLocale
-ManifestVersion: 1.12.0
+ManifestVersion: 1.28.0

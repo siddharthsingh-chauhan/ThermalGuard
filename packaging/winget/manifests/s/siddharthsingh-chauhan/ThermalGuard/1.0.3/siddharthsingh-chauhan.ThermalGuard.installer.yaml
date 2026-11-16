@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.28.0.schema.json
 
 PackageIdentifier: siddharthsingh-chauhan.ThermalGuard
 PackageVersion: 1.0.3
@@ -17,4 +17,4 @@ Installers:
   InstallerUrl: https://github.com/siddharthsingh-chauhan/ThermalGuard/releases/download/v1.0.3/ThermalGuard-Setup-1.0.3.exe
   InstallerSha256: 3597AB6C511B4A3B62FA7333059705DA00D0A7EF9383738644EA8D40FA9E6120
 ManifestType: installer
-ManifestVersion: 1.12.0
+ManifestVersion: 1.28.0
