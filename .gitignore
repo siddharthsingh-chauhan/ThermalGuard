@@ -1,0 +1,11 @@
+.venv/
+build/
+dist/
+__pycache__/
+*.pyc
+*.log
+*.old
+# Machine-specific diagnostics (powercfg /sleepstudy, /batteryreport, /energy)
+sleepstudy*.html
+battery-report*.html
+energy-report*.html
